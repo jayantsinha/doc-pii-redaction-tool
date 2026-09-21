@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# tool output/scratch
+*_redacted.pdf
+*.tmp.pdf
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
