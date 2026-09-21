@@ -2,7 +2,7 @@
 
 CLI that permanently redacts PII (email addresses, phone numbers) from PDF files, scoped to a page region.
 
-Uses [PyMuPDF](https://pymupdf.readthedocs.io/) redaction annotations — matched text is removed from the PDF content stream (not just visually covered), boxed over, and the document is metadata-scrubbed.
+Uses [PyMuPDF](https://pymupdf.readthedocs.io/) redaction annotations — matched text is removed from the PDF content stream (not just visually covered), boxed over, and the document is metadata-scrubbed. Every save also runs full garbage collection (`garbage=4, clean=True`), so unreferenced/orphaned objects (e.g. a leftover watermark stream from a prior tool) — invisible to any viewer but recoverable with `strings` or a repair tool — are stripped from the file too, not just redacted matches.
 
 ## Install
 
@@ -46,13 +46,15 @@ Regex-based detection only:
 
 Person names and generic user IDs are **not** detected — regex can't reliably distinguish those from other text, and false positives would break document content.
 
+PII baked into a rasterized image (rather than real text) is also not detected — this tool only reads/redacts the PDF's text layer, no OCR.
+
 ## Testing
 
 ```
 python3 test_redact.py
 ```
 
-Builds a synthetic PDF with known PII in each region and asserts each region flag redacts only its own PII, leaving the rest intact.
+Builds a synthetic PDF with known PII in each region and asserts each region flag redacts only its own PII, leaving the rest intact. Also builds a PDF with a deliberately unreferenced object (simulating a leftover watermark stream) and asserts its raw bytes don't survive redaction.
 
 ## License
 

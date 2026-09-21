@@ -104,13 +104,17 @@ def process_file(
     if scrub:
         doc.scrub()
     out_path = path if inplace else path.with_name(f"{path.stem}_redacted.pdf")
+    # garbage=4 + clean rebuild the file from only reachable objects — without this,
+    # unreferenced/orphaned objects (e.g. a prior watermark's leftover content stream)
+    # survive untouched, invisible to any viewer but recoverable with `strings`.
+    save_kwargs = dict(garbage=4, deflate=True, clean=True)
     if inplace:
         tmp = path.with_suffix(".tmp.pdf")
-        doc.save(tmp)
+        doc.save(tmp, **save_kwargs)
         doc.close()
         tmp.replace(path)
     else:
-        doc.save(out_path)
+        doc.save(out_path, **save_kwargs)
         doc.close()
     return out_path, count
 
